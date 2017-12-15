@@ -150,18 +150,31 @@ export default class Demo extends React.Component {
       js: state.sourceCode,
       css: prefillStyle,
     };
+    const dependencies = state.sourceCode.split('\n').reduce((acc, line) => {
+      const matches = line.match(/import .+? from '(.+)';$/);
+      if (matches && matches[1]) {
+        acc[matches[1]] = 'latest';
+      }
+      return acc;
+    }, { react: 'latest', 'react-dom': 'latest' });
     const codesanboxPrefillConfig = {
       files: {
         'package.json': {
           content: {
-            dependencies: {
-              react: '15',
-              'react-dom': '15',
-            },
+            dependencies,
           },
         },
+        'index.css': {
+          content: (style || '').replace(new RegExp(`#${meta.id}\\s*`, 'g'), ''),
+        },
         'index.js': {
-          content: `import React from 'react';\nimport ReactDOM from 'react-dom';\n${state.sourceCode}`,
+          content: `
+import React from 'react';
+import ReactDOM from 'react-dom';
+import 'antd/dist/antd.css';
+import './index.css';
+${state.sourceCode.replace('mountNode', 'document.getElementById(\'container\')')}
+          `,
         },
         'index.html': {
           content: html,
@@ -225,8 +238,8 @@ export default class Demo extends React.Component {
               </form>
               <form action="https://codesandbox.io/api/v1/sandboxes/define" method="POST" target="_blank">
                 <input type="hidden" name="parameters" value={compress(JSON.stringify(codesanboxPrefillConfig))} />
-                <Tooltip title={<FormattedMessage id="app.demo.codepen" />}>
-                  <input type="submit" value="Create New Pen with Prefilled Data" className="code-box-codepen" />
+                <Tooltip title={<FormattedMessage id="app.demo.codesandbox" />}>
+                  <input type="submit" value="Create New Sandbox with Prefilled Data" className="code-box-codesandbox" />
                 </Tooltip>
               </form>
               <CopyToClipboard
