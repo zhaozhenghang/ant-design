@@ -28,7 +28,7 @@ class Demo extends React.Component {
         defaultExpandedKeys={['0-0-0']}
         onSelect={this.onSelect}
       >
-        <TreeNode title="parent 1" key="0-0">
+        <TreeNode title="嗷嗷" key="0-0">
           <TreeNode title="parent 1-0" key="0-0-0">
             <TreeNode title="leaf" key="0-0-0-0" />
             <TreeNode title="leaf" key="0-0-0-1" />
